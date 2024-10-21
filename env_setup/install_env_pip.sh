@@ -2,7 +2,7 @@
 
 # Install necessary pip packages from requirements file
 pip install -r ilan_env_requirements.txt
-pip3 install torch==1.9.0+cu111 torchvision==0.10.0+cu111 -f https://download.pytorch.org/whl/torch_stable.html
+pip3 install torch==1.11.0+cu111 torchvision==0.10.0+cu111 -f https://download.pytorch.org/whl/torch_stable.html
 
 # Set up environment variable scripts
 mkdir -p /etc/pip/activate.d
