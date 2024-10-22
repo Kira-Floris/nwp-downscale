@@ -1,7 +1,8 @@
 import torch
 from torch.nn import functional as F
 from torch import nn
-from pytorch_lightning.core.lightning import LightningModule
+# from pytorch_lightning.core.lightning import LightningModule
+from pytorch_lightning import LightningModule
 import pytorch_lightning as pl
 from pytorch_lightning import loggers as pl_loggers
 from pytorch_lightning.plugins import DDPPlugin
