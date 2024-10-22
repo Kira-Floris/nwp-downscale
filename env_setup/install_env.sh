@@ -40,4 +40,5 @@ echo 'unset OLD_LD_LIBRARY_PATH' >> /opt/conda/envs/ilan/etc/conda/deactivate.d/
 
 # Deactivate and reactivate the environment
 conda deactivate
+conda init
 conda activate ilan
