@@ -4,6 +4,7 @@
 conda env create --file ilan_env.yml -y
 
 # Activate the conda environment
+conda init
 conda activate ilan
 
 # Install pip without confirmation
@@ -12,6 +13,7 @@ conda install pip -y
 # Deactivate and reactivate the environment to ensure pip is available
 conda deactivate
 conda deactivate
+conda init
 conda activate ilan
 
 # Install packages from requirements file without confirmation
