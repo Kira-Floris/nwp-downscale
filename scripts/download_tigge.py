@@ -6,9 +6,42 @@ import calendar
 import pandas as pd
 import os
 import xarray as xr
-import time
 
-# Other dictionaries (var_dict, cf2pynio, long2short, areas) remain the same
+var_dict = {
+    'total_precipitation': '228228',
+    'total_column_water': '136',
+    '2m_temperature': '167',
+    'convective_available_potential_energy': '59',
+    'convective_inhibition': '228001',
+    'u_component_of_wind': '131',
+    'v_component_of_wind': '132'
+}
+
+cf2pynio = {
+    'total_precipitation': 'tp_P11_L1_GGA0_acc',
+    'total_column_water': 'tcw_P1_L1_GGA0',
+    '2m_temperature': '2t_P1_L103_GGA0',
+    'convective_available_potential_energy': 'cape_P1_L1_GGA0',
+    'convective_inhibition': 'ci_P1_L1_GGA0',
+    'u_component_of_wind': 'u_P1_L100_GGA0',
+    'v_component_of_wind': 'v_P1_L100_GGA0'
+}
+
+long2short = {
+    'total_precipitation': 'tp',
+    'total_column_water': 'tcw',
+    '2m_temperature': 't2m',
+    'convective_available_potential_energy': 'cape',
+    'convective_inhibition': 'cin',
+    'u_component_of_wind': 'u',
+    'v_component_of_wind': 'v'
+}
+
+areas = {
+    'CONUS': [[50, 20], [235, 290]]
+}
+
+
 
 def crop_to_nc(fn, lats, lons, var):
     ds = xr.open_mfdataset(fn, engine='pynio')[cf2pynio[var]].rename(long2short[var])
@@ -25,22 +58,6 @@ def crop_to_nc(fn, lats, lons, var):
     ds.to_netcdf(fn_nc)
     print('Saved to nc:', fn_nc)
 
-def download_with_retries(server, request, fn, retries=3, delay=5):
-    """
-    Download data from ECMWF with a retry mechanism.
-    """
-    for attempt in range(retries):
-        try:
-            server.retrieve(request)
-            return True
-        except APIException as e:
-            print(f"Attempt {attempt + 1} failed: {e}")
-            if attempt < retries - 1:
-                print(f"Retrying in {delay} seconds...")
-                time.sleep(delay)
-            else:
-                print(f"Failed to download {fn} after {retries} attempts.")
-                return False
 
 def main(var, start_month, stop_month, dir, ensemble=False, members=50, lead_time=48, dt=6, level=None, check_exists=True,
          lats=[90, -90], lons=[0, 360], area='CONUS', delete_grib=True):
@@ -78,6 +95,7 @@ def main(var, start_month, stop_month, dir, ensemble=False, members=50, lead_tim
                 "time": "00:00:00/12:00:00",
                 "type": "cf",
                 "target": fn,
+                # "format": "netcdf"
             }
 
             if level:
@@ -87,17 +105,16 @@ def main(var, start_month, stop_month, dir, ensemble=False, members=50, lead_tim
                 request['number'] = '/'.join(np.arange(1, members+1).astype(str))
                 request['type'] = 'pf'
 
-            success = download_with_retries(server, request, fn)
+            server.retrieve(request)
             
-            if success:
-                print('Converting to nc')
-                crop_to_nc(fn, lats, lons, var)
-                if delete_grib:
-                    print('Deleting', fn)
-                    os.remove(fn)
+            print('Converting to nc')
+            crop_to_nc(fn, lats, lons, var)
+            if delete_grib:
+                print('Deleting', fn)
+                os.remove(fn)
 
-        except APIException as e:
-            print(f'Damaged files for {month}-01/to/{month}-{days}: {e}')
+        except APIException:
+            print(f'Damaged files {month}-01/to/{month}-{days}')
     
 if __name__ == '__main__':
     Fire(main)
