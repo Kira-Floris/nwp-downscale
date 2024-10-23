@@ -7,6 +7,9 @@ import pandas as pd
 import os
 import xarray as xr
 
+# Specify the path to your .ecmwfapirc file in /kaggle/working
+os.environ["ECMWF_API_RC"] = "/kaggle/working/.ecmwfapirc"
+
 var_dict = {
     'total_precipitation': '228228',
     'total_column_water': '136',
