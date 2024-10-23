@@ -86,6 +86,9 @@ def main(var, start_month, stop_month, dir, ensemble=False, members=50, lead_tim
                 print(fn_nc, 'exists')
                 continue
 
+            latitude = 51.5074  # Latitude for London
+            longitude = -0.1278  # Longitude for London
+
             request = {
                 "class": "ti",
                 "dataset": "tigge",
@@ -99,6 +102,7 @@ def main(var, start_month, stop_month, dir, ensemble=False, members=50, lead_tim
                 "type": "cf",
                 "target": fn,
                 # "format": "netcdf"
+                "area":f'{latitude + 0.05}/{longitude - 0.05}/{latitude - 0.05}/{longitude + 0.05}',
             }
 
             if level:
